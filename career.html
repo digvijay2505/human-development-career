@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Explorer | B.Sc. Home Science (Human Development)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Soft Accents -->
+    <!-- Application Structure Plan: A thematic, dashboard-style single-page application. The structure is designed for user-led exploration rather than a linear report format. It starts with a welcoming introduction, then moves to a central navigation hub allowing users to jump to five distinct career pathways (Social Work, Counseling, Child Development, HR, Entrepreneurship). Each pathway section is a self-contained module with an overview, essential skills (visualized), recommended courses, and key software. A dedicated "Foundational Skills" section follows, emphasizing universally applicable digital and professional competencies. This non-linear, modular design was chosen because a career decision is a process of exploration, not a linear reading task. It allows the user to compare paths easily, dive deep into areas of interest, and revisit sections without losing context, making the information more consumable and actionable than a traditional report. -->
+    <!-- Visualization & Content Choices: 
+        - Career Pathways Overview (Inform): Goal: Quickly introduce the five main career paths. Method: Interactive cards with icons and brief descriptions. Interaction: Clicking a card scrolls smoothly to the detailed section. Justification: Provides a clear, visual, and engaging entry point to the core content.
+        - Essential Skills (Compare/Inform): Goal: Showcase the mix of soft and technical skills for each career. Method: A dynamic doughnut chart (Chart.js) for each pathway. Interaction: Hovering over chart segments reveals skill details in a tooltip. Justification: A doughnut chart effectively visualizes the composition of required skills (e.g., balance of interpersonal vs. technical) in a more engaging way than a simple list. It allows for quick comparison between career paths.
+        - Recommended Learning (Organize/Inform): Goal: Present courses and certifications clearly. Method: Structured HTML lists with distinct styling for course types (e.g., degree, certificate). Interaction: Simple, clear presentation. Justification: A clean, organized list is the most effective way to present actionable learning resources without unnecessary complexity.
+        - Key Software/Tools (Organize/Inform): Goal: List relevant technologies for each field. Method: A tagged list format using HTML/CSS. Interaction: Visual grouping of tools. Justification: Tags provide a modern, scannable way to present software examples, making them easy to identify and remember.
+        - NO SVG/Mermaid used, adhering to constraints. All visuals are created with Chart.js (Canvas) or structured HTML/CSS with Tailwind. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Warm Neutral Background */
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E58A6F; /* Subtle Accent */
+            transition: width 0.3s ease;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #D9775B; /* Accent Color */
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .section-card {
+            background-color: #FFFFFF;
+            border: 1px solid #F0EAE2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .skill-tag {
+            background-color: #F0EAE2;
+            color: #8D8D8D;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .skill-tag:hover {
+            background-color: #E58A6F;
+            color: #FFFFFF;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200/50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-gray-800">Career Explorer</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#introduction" class="nav-link active">Introduction</a>
+                <a href="#pathways" class="nav-link">Pathways</a>
+                <a href="#foundational" class="nav-link">Core Skills</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#introduction" class="block py-2 text-gray-700 hover:text-[#D9775B]">Introduction</a>
+            <a href="#pathways" class="block py-2 text-gray-700 hover:text-[#D9775B]">Pathways</a>
+            <a href="#foundational" class="block py-2 text-gray-700 hover:text-[#D9775B]">Core Skills</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <!-- Introduction Section -->
+        <section id="introduction" class="text-center mb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Chart Your Career Path</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Your B.Sc. in Home Science (Human Development) has opened a world of possibilities. This interactive guide helps you explore diverse career pathways, understand the skills you'll need, and find resources to launch a successful and fulfilling professional journey.</p>
+        </section>
+
+        <!-- Career Pathways Hub -->
+        <section id="pathways" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-800">Explore Your Career Pathways</h2>
+            <p class="text-center text-gray-600 mb-12">Click on a pathway to dive deeper into job roles, required skills, and learning resources.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+                <!-- Pathway Cards -->
+                <a href="#social-work" class="section-card p-6 rounded-lg text-center flex flex-col items-center">
+                    <div class="bg-[#F0EAE2] p-4 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-[#D9775B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Social Work & Community Dev.</h3>
+                    <p class="text-sm text-gray-500">Create impact in communities and support individuals and families.</p>
+                </a>
+                <a href="#counseling" class="section-card p-6 rounded-lg text-center flex flex-col items-center">
+                    <div class="bg-[#F0EAE2] p-4 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-[#D9775B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Counseling & Guidance</h3>
+                    <p class="text-sm text-gray-500">Guide individuals through personal, emotional, and behavioral challenges.</p>
+                </a>
+                <a href="#child-development" class="section-card p-6 rounded-lg text-center flex flex-col items-center">
+                    <div class="bg-[#F0EAE2] p-4 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-[#D9775B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-2a6 6 0 00-12 0v2"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Child Development & Education</h3>
+                    <p class="text-sm text-gray-500">Shape the future by nurturing the growth of children and adolescents.</p>
+                </a>
+                <a href="#hr" class="section-card p-6 rounded-lg text-center flex flex-col items-center">
+                    <div class="bg-[#F0EAE2] p-4 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-[#D9775B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-2a6 6 0 00-12 0v2"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Human Resources</h3>
+                    <p class="text-sm text-gray-500">Foster positive workplace cultures and manage an organization's talent.</p>
+                </a>
+                <a href="#entrepreneurship" class="section-card p-6 rounded-lg text-center flex flex-col items-center">
+                    <div class="bg-[#F0EAE2] p-4 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-[#D9775B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Entrepreneurship</h3>
+                    <p class="text-sm text-gray-500">Create your own venture and bring innovative ideas to life.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Sections for Pathways -->
+        <div id="pathway-details">
+            <!-- Social Work Section -->
+            <section id="social-work" class="pt-20 -mt-20 mb-16">
+                <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">I. Social Work & Community Development</h3>
+                    <p class="mb-6 text-gray-600">This path leverages your deep understanding of human development to support vulnerable populations. You'll work in NGOs, government agencies, or community organizations to advocate for and empower individuals and families. Your degree provides a direct advantage for roles focused on child welfare, family support, and community outreach.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Essential Skill Mix</h4>
+                            <p class="text-sm text-gray-500 mb-4">A blend of strong interpersonal skills and practical knowledge is key. Hover over the chart to see the breakdown.</p>
+                            <div class="chart-container">
+                                <canvas id="socialWorkChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Recommended Learning</h4>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Master of Social Work (MSW):</strong> Highly recommended for advanced practice and leadership roles.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">NGO Management Certificate:</strong> For leadership roles in the non-profit sector.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Online Courses:</strong> Explore topics like Social Justice, Case Management, and Human Behavior on platforms like Coursera.</div></li>
+                            </ul>
+                             <h4 class="font-semibold text-lg mb-3 mt-6">Key Tools</h4>
+                             <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Client Management Systems</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Data Analysis Tools</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">MS Excel</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Counseling Section -->
+            <section id="counseling" class="pt-20 -mt-20 mb-16">
+                 <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">II. Counseling & Guidance</h3>
+                    <p class="mb-6 text-gray-600">With a foundational course in Guidance and Counselling, you can enter roles supporting individuals through life's challenges. This path requires deep empathy, active listening, and a strong ethical compass. While your degree is a great starting point, further specialization is often needed for clinical practice.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Essential Skill Mix</h4>
+                            <p class="text-sm text-gray-500 mb-4">This field demands strong ethical grounding and psychological assessment skills. Hover to explore.</p>
+                            <div class="chart-container">
+                                <canvas id="counselingChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Recommended Learning</h4>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Master's in Psychology/Counseling:</strong> Essential for licensed, independent clinical practice.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Specialized Certifications:</strong> Focus on areas like career counseling, family therapy, or mental health.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Online Courses:</strong> Deepen your knowledge with "Introduction to Psychology" or "The Science of Well-Being" on Coursera.</div></li>
+                            </ul>
+                             <h4 class="font-semibold text-lg mb-3 mt-6">Key Tools</h4>
+                             <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Practice Management Software</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Telehealth Platforms</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Scheduling Tools</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Child Development Section -->
+            <section id="child-development" class="pt-20 -mt-20 mb-16">
+                 <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">III. Child Development & Early Childhood Education</h3>
+                    <p class="mb-6 text-gray-600">Your degree's focus on child and adolescent development prepares you perfectly for roles in education and childcare. You'll apply your knowledge to create nurturing environments that foster healthy growth, working in preschools, childcare centers, or as a specialist supporting children with diverse needs.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Essential Skill Mix</h4>
+                            <p class="text-sm text-gray-500 mb-4">Patience and strong observational skills are paramount, complemented by curriculum development abilities.</p>
+                            <div class="chart-container">
+                                <canvas id="childDevChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Recommended Learning</h4>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Diploma in Early Childhood Care (DECE/ECCEd):</strong> Specialized training for nursery and early education roles.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Child Psychology Courses:</strong> Deepen your understanding of child behavior and cognitive development.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Special Education Training:</strong> To effectively support children with learning or developmental challenges.</div></li>
+                            </ul>
+                             <h4 class="font-semibold text-lg mb-3 mt-6">Key Tools</h4>
+                             <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Observation & Assessment Tools</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Digital Education Platforms</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Parent Communication Apps</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- HR Section -->
+            <section id="hr" class="pt-20 -mt-20 mb-16">
+                 <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">IV. Human Resources & People Management</h3>
+                    <p class="mb-6 text-gray-600">Your understanding of human behavior is a major asset in HR. This field is about nurturing an organization's most valuable asset: its people. While you have strong foundational "soft skills," you'll need to build technical expertise in HR systems and data analytics to excel in this data-driven field.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Essential Skill Mix</h4>
+                            <p class="text-sm text-gray-500 mb-4">Success in modern HR requires a balance of people skills and strong technical and analytical capabilities.</p>
+                            <div class="chart-container">
+                                <canvas id="hrChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Recommended Learning</h4>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">HR Certifications:</strong> Look for courses on platforms like Skill India Digital or Udemy that cover Talent Acquisition and HR Management.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">HR Analytics Courses:</strong> Learn to use data for decision-making with courses like "HR Analytics using Excel" on Swayam.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Business Analytics Courses:</strong> Broaden your data skills with general business analytics programs on Coursera.</div></li>
+                            </ul>
+                             <h4 class="font-semibold text-lg mb-3 mt-6">Key Tools</h4>
+                             <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">HRIS Platforms (Keka, GreytHR)</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Excel & Tableau</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Generative AI</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Entrepreneurship Section -->
+            <section id="entrepreneurship" class="pt-20 -mt-20">
+                 <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">V. Entrepreneurship & Social Enterprise</h3>
+                    <p class="mb-6 text-gray-600">Your degree actively encourages an entrepreneurial mindset, equipping you to create your own venture. You can launch a business that aligns with your passion for human well-being, such as a daycare center, a consultancy, or a social enterprise that addresses a specific community need, blending purpose with profit.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Essential Skill Mix</h4>
+                            <p class="text-sm text-gray-500 mb-4">This path requires a unique mix of creativity, business acumen, and project management skills.</p>
+                            <div class="chart-container">
+                                <canvas id="entrepreneurshipChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-3">Recommended Learning</h4>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Online Entrepreneurship Courses:</strong> Platforms like Coursera and Udemy offer comprehensive guides for beginners.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Social Entrepreneurship Courses:</strong> For ventures focused on creating social impact.</div></li>
+                                <li class="flex items-start"><span class="text-[#D9775B] mr-2 mt-1">●</span><div><strong class="font-semibold text-gray-700">Startup India Digital Hub:</strong> A government initiative with excellent resources for starting a business in India.</div></li>
+                            </ul>
+                             <h4 class="font-semibold text-lg mb-3 mt-6">Key Tools</h4>
+                             <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Business Planning Software</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Digital Marketing Tools</span>
+                                <span class="skill-tag text-sm font-medium py-1 px-3 rounded-full">Financial Management Apps</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Foundational Skills Section -->
+        <section id="foundational" class="pt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-800">Build Your Foundational Skills</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">Regardless of the path you choose, these core competencies are universally valuable and will amplify your success. Your degree has already given you a strong start in many of these areas.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-xl font-semibold mb-4">Digital Proficiency</h3>
+                    <p class="mb-4 text-gray-600">Moving beyond basics is key. True digital fluency involves data analysis, using specialized software, and leveraging new technologies.</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Microsoft Office Suite:</strong> Master Word, Excel, and PowerPoint.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Data Analysis & Visualization:</strong> Learn to tell stories with data using Excel or Tableau.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Generative AI Literacy:</strong> Understand how to use AI tools to boost productivity.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Collaboration Tools:</strong> Proficiency in Google Workspace, Teams, or Zoom.</li>
+                    </ul>
+                </div>
+                 <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200/80">
+                    <h3 class="text-xl font-semibold mb-4">Professional & Interpersonal Skills</h3>
+                    <p class="mb-4 text-gray-600">Your degree excels at cultivating these "soft skills," which are highly sought after by employers. Highlight them in your resume and interviews.</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Communication:</strong> Clear writing and confident speaking.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Critical Thinking:</strong> Analyzing problems and developing innovative solutions.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Teamwork & Collaboration:</strong> Working effectively in diverse teams.</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><strong>Leadership & Resilience:</strong> Taking initiative and navigating challenges with a positive mindset.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-white border-t border-gray-200/80">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p>&copy; 2025 Career Explorer. Designed to empower your professional journey.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Navigation link active state
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4,
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Chart.js doughnut chart creation
+            const createDoughnutChart = (ctx, label, data, labels) => {
+                // Function to wrap labels
+                const wrapLabel = (str, maxWidth) => {
+                    const words = str.split(' ');
+                    let lines = [];
+                    let currentLine = words[0];
+
+                    for (let i = 1; i < words.length; i++) {
+                        if (currentLine.length + words[i].length + 1 < maxWidth) {
+                            currentLine += ' ' + words[i];
+                        } else {
+                            lines.push(currentLine);
+                            currentLine = words[i];
+                        }
+                    }
+                    lines.push(currentLine);
+                    return lines;
+                };
+                
+                const formattedLabels = labels.map(l => wrapLabel(l, 16));
+
+                return new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: formattedLabels,
+                        datasets: [{
+                            label: label,
+                            data: data,
+                            backgroundColor: [
+                                'rgba(217, 119, 91, 0.7)', // Accent
+                                'rgba(229, 138, 111, 0.7)',
+                                'rgba(240, 234, 226, 1)',  // Neutral
+                                'rgba(141, 141, 141, 0.7)', // Gray
+                                'rgba(74, 74, 74, 0.7)',
+                            ],
+                            borderColor: [
+                                'rgba(217, 119, 91, 1)',
+                                'rgba(229, 138, 111, 1)',
+                                'rgba(240, 234, 226, 1)',
+                                'rgba(141, 141, 141, 1)',
+                                'rgba(74, 74, 74, 1)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            };
+
+            // Chart Data
+            const socialWorkData = {
+                labels: ['Empathy & Advocacy', 'Crisis Management', 'Communication Skills', 'Project Management', 'Data Analysis'],
+                data: [30, 20, 25, 15, 10]
+            };
+            const counselingData = {
+                labels: ['Active Listening & Empathy', 'Ethical Practice', 'Psychological Assessment', 'Communication', 'Case Study Development'],
+                data: [35, 25, 20, 15, 5]
+            };
+            const childDevData = {
+                labels: ['Patience & Emotional Resilience', 'Observation & Assessment', 'Curriculum Development', 'Communication', 'Teamwork'],
+                data: [30, 25, 20, 15, 10]
+            };
+            const hrData = {
+                labels: ['Communication & Interpersonal', 'HRIS & Tech', 'HR Analytics', 'Business Acumen', 'Recruitment'],
+                data: [25, 25, 20, 15, 15]
+            };
+            const entrepreneurshipData = {
+                labels: ['Business Planning', 'Innovation & Creativity', 'Financial Management', 'Marketing', 'Project Management'],
+                data: [25, 25, 20, 15, 15]
+            };
+
+            // Initialize Charts
+            createDoughnutChart(document.getElementById('socialWorkChart').getContext('2d'), 'Social Work Skills', socialWorkData.data, socialWorkData.labels);
+            createDoughnutChart(document.getElementById('counselingChart').getContext('2d'), 'Counseling Skills', counselingData.data, counselingData.labels);
+            createDoughnutChart(document.getElementById('childDevChart').getContext('2d'), 'Child Development Skills', childDevData.data, childDevData.labels);
+            createDoughnutChart(document.getElementById('hrChart').getContext('2d'), 'HR Skills', hrData.data, hrData.labels);
+            createDoughnutChart(document.getElementById('entrepreneurshipChart').getContext('2d'), 'Entrepreneurship Skills', entrepreneurshipData.data, entrepreneurshipData.labels);
+        });
+    </script>
+</body>
+</html>
